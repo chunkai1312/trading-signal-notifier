@@ -41,7 +41,7 @@ export class NotifierService {
       volume: [...candles.volume, candle.volume],
     }), { date: [], open: [], high: [], low: [], close: [], volume: [] });
 
-    Logger.log('candles data initialized', NotifierService.name)
+    Logger.log(`${symbol} candles data initialized`, NotifierService.name);
   }
 
   @Cron('00 25 13 * * *')
