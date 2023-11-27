@@ -1,0 +1,12 @@
+version: "3"
+
+services:
+  trading-signal-notifier:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    image: trading-signal-notifier:latest
+    environment:
+      - FUGLE_MARKETDATA_API_KEY=${FUGLE_MARKETDATA_API_KEY}
+      - LINE_NOTIFY_ACCESS_TOKEN=${LINE_NOTIFY_ACCESS_TOKEN}
+    restart: always
