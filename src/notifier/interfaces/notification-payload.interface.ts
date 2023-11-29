@@ -1,7 +1,10 @@
 export interface NotificationPayload {
   symbol: string;
   name: string;
-  price: string;
+  open: string;
+  high: string;
+  low: string;
+  close: string;
   volume: string;
   change: string;
   changePercent: string;

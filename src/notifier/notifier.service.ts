@@ -10,7 +10,7 @@ import { CandlesData, NotificationPayload } from './interfaces';
 
 @Injectable()
 export class NotifierService {
-  private readonly symbol = '0050';
+  private readonly symbol = 'IX0001';
   private candles: CandlesData;
 
   constructor(
@@ -57,14 +57,14 @@ export class NotifierService {
       this.candles.high.push(quote.highPrice);
       this.candles.low.push(quote.lowPrice);
       this.candles.close.push(quote.closePrice);
-      this.candles.volume.push(quote.total?.tradeVolume * 1000);
+      this.candles.volume.push(quote.total?.tradeValue);
     } else {
       this.candles.date[index] = quote.date;
       this.candles.open[index] = quote.openPrice;
       this.candles.high[index] = quote.highPrice;
       this.candles.low[index] = quote.lowPrice;
       this.candles.close[index] = quote.closePrice;
-      this.candles.volume[index] = quote.total.tradeVolume * 1000;
+      this.candles.volume[index] = quote.total.tradeValue;
     }
 
     const { close, low, high } = this.candles;
@@ -76,8 +76,11 @@ export class NotifierService {
     await this.sendNotification({
       symbol: quote.symbol,
       name: quote.name,
-      price: numeral(quote.closePrice).format('0.00'),
-      volume: numeral(quote.total.tradeVolume).format('0'),
+      open: numeral(quote.openPrice).format('0.00'),
+      high: numeral(quote.highPrice).format('0.00'),
+      low: numeral(quote.lowPrice).format('0.00'),
+      close: numeral(quote.closePrice).format('0.00'),
+      volume: numeral(quote.total.tradeValue).divide(1e8).format('0.00'),
       change: numeral(quote.change).format('+0.00'),
       changePercent: numeral(quote.changePercent).format('+0.00'),
       time: DateTime.fromMillis(Math.floor(quote.lastUpdated / 1000)).toFormat('yyyy/MM/dd HH:mm:ss'),
@@ -88,16 +91,20 @@ export class NotifierService {
   }
 
   async sendNotification(payload: NotificationPayload) {
-    const { symbol, name, price, change, changePercent, time, k, d, j } = payload;
-
     const message = [''].concat([
-      `${name} (${symbol})`,
+      `${payload.name} (${payload.symbol})`,
       `---`,
-      `成交: ${price}`,
-      `漲跌: ${change} (${changePercent})`,
-      `K: ${k} D: ${d} J: ${j}`,
+      `開: ${payload.open}`,
+      `高: ${payload.high}`,
+      `低: ${payload.low}`,
+      `收: ${payload.close}`,
+      `量: ${payload.volume}億元`,
+      `${+payload.change < 0 ? '跌' : '漲'}: ${payload.change}`,
+      `幅: ${payload.changePercent}%`,
       `---`,
-      `時間: ${time}`,
+      `K: ${payload.k} D: ${payload.d} J: ${payload.j}`,
+      `---`,
+      `時間: ${payload.time}`,
     ]).join('\n');
 
     await this.lineNotify.send({ message })
