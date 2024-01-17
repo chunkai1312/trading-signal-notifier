@@ -44,7 +44,7 @@ export class NotifierService {
     Logger.log(`${symbol} candles data initialized`, NotifierService.name);
   }
 
-  @Cron('00 25 13 * * *')
+  @Cron('00 30 12 * * *')
   async fetchQuote() {
     const symbol = this.symbol;
     const quote = await this.client.stock.intraday.quote({ symbol });
